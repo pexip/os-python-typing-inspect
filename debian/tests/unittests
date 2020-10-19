@@ -1,0 +1,12 @@
+#!/bin/sh
+set -efu
+
+pys="$(py3versions -s 2> /dev/null)"
+
+cp -a test_typing_inspect.py "$AUTOPKGTEST_TMP"
+cd "$AUTOPKGTEST_TMP"
+
+for py in $pys; do
+	echo "=== $py ==="
+	$py -m unittest test_typing_inspect.py 2>&1
+done

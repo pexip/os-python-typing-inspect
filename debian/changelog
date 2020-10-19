@@ -1,0 +1,13 @@
+python-typing-inspect (0.7.1-1) unstable; urgency=medium
+
+  * New upstream release. (Closes: #972803)
+  * d/tests: fix unittests autopkgtest for multiple Python versions.
+    (Closes: #973905)
+
+ -- Louis-Philippe Véronneau <pollo@debian.org>  Mon, 19 Oct 2020 01:40:46 -0400
+
+python-typing-inspect (0.6.0-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #971340)
+
+ -- Louis-Philippe Véronneau <pollo@debian.org>  Mon, 28 Sep 2020 22:12:38 -0400

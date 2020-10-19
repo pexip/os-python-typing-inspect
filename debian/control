@@ -1,0 +1,24 @@
+Source: python-typing-inspect
+Section: python
+Priority: optional
+Maintainer: Debian Python Team <team+python@tracker.debian.org>
+Uploaders: Louis-Philippe Véronneau <pollo@debian.org>
+Rules-Requires-Root: no
+Build-Depends: debhelper-compat (= 13),
+               dh-python,
+               python3-all,
+               python3-setuptools,
+               python3-mypy-extensions <!nocheck>,
+               python3-typing-extensions <!nocheck>,
+Standards-Version: 4.5.0.0
+Vcs-Git: https://salsa.debian.org/python-team/packages/python-typing-inspect.git
+Vcs-Browser: https://salsa.debian.org/python-team/packages/python-typing-inspect
+Homepage: https://github.com/ilevkivskyi/typing_inspect
+
+Package: python3-typing-inspect
+Architecture: all
+Depends: ${python3:Depends},
+         ${misc:Depends},
+Description: API for runtime inspection of types in Python
+ The typing-inspect module defines experimental API for runtime inspection of
+ types defined in the Python standard typing module.
