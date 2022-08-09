@@ -1,4 +1,4 @@
-python-typing-inspect (0.7.1-1pexip1) pexip; urgency=medium
+python-typing-inspect (0.7.1-1pexip1) pexip-bullseye; urgency=medium
 
   * Prepare Pexip packaging
 
