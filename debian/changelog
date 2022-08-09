@@ -1,3 +1,9 @@
+python-typing-inspect (0.7.1-1pexip1) pexip; urgency=medium
+
+  * Prepare Pexip packaging
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Tue, 09 Aug 2022 10:15:35 +0100
+
 python-typing-inspect (0.7.1-1) unstable; urgency=medium
 
   * New upstream release. (Closes: #972803)
