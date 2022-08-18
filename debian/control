@@ -10,7 +10,8 @@ Build-Depends: debhelper-compat (= 13),
                python3-setuptools,
                python3-mypy-extensions <!nocheck>,
                python3-typing-extensions <!nocheck>,
-Standards-Version: 4.5.0.0
+               python3-pytest <!nocheck>
+Standards-Version: 4.6.1
 Vcs-Git: https://salsa.debian.org/python-team/packages/python-typing-inspect.git
 Vcs-Browser: https://salsa.debian.org/python-team/packages/python-typing-inspect
 Homepage: https://github.com/ilevkivskyi/typing_inspect
