@@ -1,2 +1,2 @@
 Tests: unittests
-Depends: @, python3-all
+Depends: @, python3-all, python3-pytest

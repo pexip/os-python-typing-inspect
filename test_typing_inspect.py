@@ -1,10 +1,14 @@
 import sys
+
+import pytest
+
 from typing_inspect import (
     is_generic_type, is_callable_type, is_new_type, is_tuple_type, is_union_type,
     is_optional_type, is_final_type, is_literal_type, is_typevar, is_classvar,
     is_forward_ref, get_origin, get_parameters, get_last_args, get_args, get_bound,
     get_constraints, get_generic_type, get_generic_bases, get_last_origin,
-    typed_dict_keys, get_forward_arg, WITH_FINAL, WITH_LITERAL, LEGACY_TYPING)
+    typed_dict_keys, get_forward_arg, WITH_FINAL, WITH_LITERAL, LEGACY_TYPING, WITH_NEWTYPE,
+)
 from unittest import TestCase, main, skipIf, skipUnless
 from typing import (
     Union, Callable, Optional, TypeVar, Sequence, AnyStr, Mapping,
@@ -15,15 +19,7 @@ from mypy_extensions import TypedDict as METypedDict
 from typing_extensions import TypedDict as TETypedDict
 from typing_extensions import Final
 from typing_extensions import Literal
-
-# Does this raise an exception ?
-#      from typing import NewType
-if sys.version_info < (3, 5, 2):
-    WITH_NEWTYPE = False
-else:
-    from typing import NewType
-    WITH_NEWTYPE = True
-
+from typing_extensions import NewType as NewType_
 
 # Does this raise an exception ?
 #      from typing import ClassVar
@@ -120,6 +116,18 @@ if PY36:
     exec(PY36_TESTS)
 
 
+# It is important for the test that this function is called 'NewType' to simulate the same __qualname__
+# - which is "NewType.<locals>.new_type" - as typing.NewType has, i.e. it should be checked that is_new_type
+# still do not accept a function which has the same __qualname__ and an attribute called __supertype__.
+def NewType(name, tp):
+    def new_type(x):
+        return x
+
+    new_type.__name__ = name
+    new_type.__supertype__ = tp
+    return new_type
+
+
 class IsUtilityTestCase(TestCase):
     def sample_test(self, fun, samples, nonsamples):
         msg = "Error asserting that %s(%s) is %s"
@@ -166,6 +174,14 @@ class IsUtilityTestCase(TestCase):
         S = TypeVar('S')
         samples = [Union, Union[T, int], Union[int, Union[T, S]]]
         nonsamples = [int, Union[int, int], [], Iterable[Any]]
+        self.sample_test(is_union_type, samples, nonsamples)
+
+    @pytest.mark.skipif(sys.version_info < (3, 10), reason="requires 3.10 or higher")
+    def test_union_pep604(self):
+        T = TypeVar('T')
+        S = TypeVar('S')
+        samples = [T | int, int | (T | S), int | str]
+        nonsamples = [int, int | int, [], Iterable[Any]]
         self.sample_test(is_union_type, samples, nonsamples)
 
     def test_optional_type(self):
@@ -248,13 +264,22 @@ class IsUtilityTestCase(TestCase):
     @skipIf(not WITH_NEWTYPE, "NewType is not present")
     def test_new_type(self):
         T = TypeVar('T')
+
+        class WithAttrSuperTypeCls:
+            __supertype__ = str
+
+        class WithAttrSuperTypeObj:
+            def __init__(self):
+                self.__supertype__ = str
+
         samples = [
-            NewType('A', int),
-            NewType('B', complex),
-            NewType('C', List[int]),
-            NewType('D', Union['p', 'y', 't', 'h', 'o', 'n']),
-            NewType('E', List[Dict[str, float]]),
-            NewType('F', NewType('F_', int)),
+            NewType_,
+            NewType_('A', int),
+            NewType_('B', complex),
+            NewType_('C', List[int]),
+            NewType_('D', Union['p', 'y', 't', 'h', 'o', 'n']),
+            NewType_('E', List[Dict[str, float]]),
+            NewType_('F', NewType('F_', int)),
         ]
         nonsamples = [
             int,
@@ -264,6 +289,12 @@ class IsUtilityTestCase(TestCase):
             Union["u", "v"],
             type,
             T,
+            NewType,
+            NewType('N', int),
+            WithAttrSuperTypeCls,
+            WithAttrSuperTypeCls(),
+            WithAttrSuperTypeObj,
+            WithAttrSuperTypeObj(),
         ]
         self.sample_test(is_new_type, samples, nonsamples)
 
@@ -306,6 +337,8 @@ class GetUtilityTestCase(TestCase):
             self.assertEqual(get_origin(ClassVar[int]), None)
         self.assertEqual(get_origin(Generic), Generic)
         self.assertEqual(get_origin(Generic[T]), Generic)
+        # Cannot use assertEqual on Py3.5.2.
+        self.assertIs(get_origin(Literal[42]), Literal)
         if PY39:
             self.assertEqual(get_origin(list[int]), list)
         if GENERIC_TUPLE_PARAMETRIZABLE:
@@ -404,6 +437,10 @@ class GetUtilityTestCase(TestCase):
             self.assertEqual(get_args(list[list[int]]), (list[int],))
             # This would return (~T,) before Python 3.9.
             self.assertEqual(get_args(List), ())
+
+        if sys.version_info >= (3, 10):
+            self.assertEqual(get_args(int | str), (int, str))
+            self.assertEqual(get_args((int | tuple[T, int])[str]), (int, tuple[str, int]))
 
     def test_bound(self):
         T = TypeVar('T')

@@ -8,5 +8,5 @@ cd "$AUTOPKGTEST_TMP"
 
 for py in $pys; do
 	echo "=== $py ==="
-	$py -m unittest test_typing_inspect.py 2>&1
+	$py -m pytest test_typing_inspect.py 2>&1
 done
