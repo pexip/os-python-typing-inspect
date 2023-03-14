@@ -1,3 +1,9 @@
+python-typing-inspect (0.8.0-1pexip1) pexip; urgency=medium
+
+  * New upstream release
+
+ -- Huw Jones <huw@pexip.com>  Tue, 14 Mar 2023 14:50:07 +0000
+
 python-typing-inspect (0.8.0-1) unstable; urgency=medium
 
   * New upstream release.
